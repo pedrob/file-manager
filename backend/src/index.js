@@ -1,17 +1,17 @@
+require('dotenv').config();
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const routes = require('./routes');
 const morgan = require('morgan'); //lib for logs
+const path = require('path'); //lib for logs
 
 mongoose
-	.connect(
-		'mongodb+srv://Pedro:admin@cluster0-k4roi.mongodb.net/file_manager?retryWrites=true&w=majority',
-		{
-			useNewUrlParser: true,
-			useUnifiedTopology: true
-		}
-	)
+	.connect(process.env.DB_CONNECTION_URL, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true
+	})
 	.then(() => {
 		console.log('Database connected');
 	})
@@ -26,6 +26,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 app.use(routes);
+app.use(
+	'/files',
+	express.static(path.resolve(__dirname, '..', 'tmp', 'uploads'))
+);
 
 app.listen(8888, () => {
 	console.log('Server running');
